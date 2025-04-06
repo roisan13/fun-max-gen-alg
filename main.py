@@ -92,6 +92,7 @@ def roulette_selection(population, firstIteration):
 def one_point_crossover(parent1, parent2, firstIteration):
     length = len(parent1)
     point = random.randint(0, length - 1)
+
     child1 = parent1[:point] + parent2[point:]
     child2 = parent2[:point] + parent1[point:]
 
@@ -118,10 +119,10 @@ def crossover_population(pop, firstIteration):
                 print(f"{i}: {encode(pop[i])} u={u}")
 
     for i in range(0, len(selected_for_crossover) - 1, 2):
-        parent1, parent2 = encode(selected_for_crossover[i]), encode(selected_for_crossover[i + 1])
+        parent1, parent2 = encode(pop[selected_for_crossover[i]]), encode(pop[selected_for_crossover[i + 1]])
 
         if firstIteration:
-            print(f"Recombinare dintre cromozomul {i} cu cromozomul {i + 1}:")
+            print(f"Recombinare dintre cromozomul {selected_for_crossover[i]} cu cromozomul {selected_for_crossover[i + 1]}:")
         child1, child2 = one_point_crossover(parent1, parent2, firstIteration)
 
         pop[i] = decode(child1)
@@ -149,16 +150,26 @@ def mutate_population(pop, firstIteration):
         pop[idx] = decode(''.join(mutated_chrom))
 
 
+def elitist_selection(population, intermediary_pop):
+    max_fitness_individual = max(population, key=fitness)
+    intermediary_pop[0] = max_fitness_individual
+    return intermediary_pop[1:]
+
+
 population = init_population()
 # Output
 print("Populatia initiala")
 print_population(population)
 
-# print(decode(encode(-0.914592)))
+# print(decode(encode(-0.9999)))
 
 for gen in range(no_generations):
     isFirstIter = (gen == 0)
-    # ELITIST SELECTION !! REMEMBER PLEASE
+
+    # print_population(population)
+
+    elite_individual = max(population, key=fitness)
+
     intermediary_pop = roulette_selection(population, isFirstIter)
 
     if isFirstIter:
@@ -176,9 +187,14 @@ for gen in range(no_generations):
     if isFirstIter:
         print("Dupa mutatie:")
         print_population(intermediary_pop)
-    else :
-        if gen == 1:
-            print("Evolutia max si mean fitness")
-        print(f"Max fitness: {23} Mean fitness: {25}")
 
+    max_fitness = max(fitness(ind) for ind in intermediary_pop)
+    mean_fitness = sum(fitness(ind) for ind in intermediary_pop) / len(intermediary_pop)
+
+    if gen == 1:
+        print("Evolutia max si mean fitness")
+    if gen > 1:
+        print(f"Max fitness: {max_fitness} Mean fitness: {mean_fitness}")
+
+    intermediary_pop[0] = elite_individual
     population = intermediary_pop
