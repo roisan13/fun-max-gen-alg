@@ -1,5 +1,10 @@
 import math
 import random
+import sys
+
+file = open("evolution.txt", "w")
+sys.stdout = file
+
 
 no_individuals = 20
 domain_left = -1
@@ -32,7 +37,7 @@ def decode(x):
 def print_population(pop):
     # Output
     for i in range(no_individuals):
-        print(f"{i + 1}: {encode(pop[i])} x = {pop[i]} f = {fitness(pop[i])}")
+        print(f"{i + 1:<5}: {encode(pop[i]):<22} x = {pop[i]:<10.5f} f = {fitness(pop[i]):<15f}")
 
 
 def init_population():
@@ -84,7 +89,7 @@ def roulette_selection(population, firstIteration):
 
         # Output
         if (firstIteration):
-            print(f"u = {u} selectam cromozomul {index + 1}")
+            print(f"u = {u:<2f} selectam cromozomul {index + 1}")
         selected.append(population[index])
 
     return selected
@@ -194,7 +199,11 @@ for gen in range(no_generations):
     if gen == 1:
         print("Evolutia max si mean fitness")
     if gen > 1:
-        print(f"Max fitness: {max_fitness} Mean fitness: {mean_fitness}")
+        print(f"Max fitness: {max_fitness:<10.10f}\t\tMean fitness: {mean_fitness}")
 
     intermediary_pop[0] = elite_individual
     population = intermediary_pop
+
+
+file.close()
+sys.stdout = sys.__stdout__
